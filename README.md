@@ -1,1 +1,2 @@
 # tradebot# NodeStructureFile
+# ec2
