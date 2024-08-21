@@ -15,27 +15,9 @@ app.use(express.json());
 app.use(express.static('resources'));
 app.use("/avatars", express.static(__dirname + "/avatars"));
 
-// Handle OPTIONS requests
-// app.options('*', function(req: Request, res: Response) {
-//   console.log("****", req.method);
-//   if (req.method === 'OPTIONS') {
-//     console.log("yes yes");
-//     // Respond with the appropriate headers for the preflight request
-//     res.header('Access-Control-Allow-Origin', '*');
-//     res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE');
-//     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//     res.status(200).send();
-//   } else {
-//     // This should never be reached for OPTIONS requests,
-//     // but we include it to avoid sending multiple responses.
-//     res.sendStatus(405); // Method Not Allowed
-//   }
-// });
-
-
-// console.log(req.method);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
+
   
   if (req.method === 'OPTIONS') {
     // Respond with the appropriate headers for the preflight request
@@ -67,9 +49,9 @@ app.use((err: any, req: Request, res: Response, next: any) => {
 db.sequelize.sync().then(() => {
     server.listen(port, async () => {
         console.log('App Started');
-        // cron.schedule('*/3 * * * *', async () => {
+        // cron.schedule('*/1 * * * *', async () => {
         //     console.log('running a task every 10 min');
-        //     await codeController.transferIdDepositAssets();
+        //     await codeController.test();
         // });
     });
 });

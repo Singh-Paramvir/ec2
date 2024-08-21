@@ -3,16 +3,16 @@ import {
   Model
 }  from 'sequelize';
 interface UserAttributes{
-firstname:string;
-email:string;
+name:string;
+
 
 
 }
 module.exports = (sequelize:any, DataTypes:any) => {
   class  User extends Model<UserAttributes>
   implements UserAttributes {
-    firstname!:string;
-    email!:string;
+    name!:string;
+ 
 
     /**
      * Helper method for defining associations.
@@ -24,12 +24,11 @@ module.exports = (sequelize:any, DataTypes:any) => {
     }
   };
   User.init({
-    firstname:{type:DataTypes.STRING,},
-    email:{type:DataTypes.STRING}
+    name:{type:DataTypes.STRING,}
  
   }, {
     sequelize,
-    modelName: 'Users',
+    modelName: 'table1',
   });
   return  User;
 };

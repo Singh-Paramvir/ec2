@@ -7,11 +7,11 @@ import db from '../models';
 class UserController {
     async register(req: Request, res: Response) {
         try {
-            const {firstname,lastname,city,state,email,password } = req.body;
+            
           
 
                 await codeController.addNewUser({
-                    firstname,lastname,city,state,email,password
+                  
                 }, res)
             
 
@@ -23,12 +23,10 @@ class UserController {
     }
     async verify(req: Request, res: Response) {
         try {
-            const {email,otp} = req.body;
-            console.log(req.body)
-          
+                   
 
                 await codeController.verify({
-                    email,otp
+                  
                 }, res)
             
 
@@ -42,9 +40,9 @@ class UserController {
 
     async login(req: Request, res: Response) {
         try {
-            const { email, password } = req.body;
+           
             await codeController.loginUser({
-                email, password
+              
 
             }, res)
         } catch (e) {
@@ -209,19 +207,7 @@ async getAll(req: Request, res: Response) {
 
     //qr code
 
-    async qrCode(req: Request, res: Response) {
-        try {
-           
-            await codeController.qrCode({
-            
-    
-            }, res)
-        } catch (e) {
-            commonController.errorMessage("qr code is not found", res)
-            console.log(e);
-    
-        }
-    }
+  
 
     //IMAGE UPLOAD
     async postImage(req, res) {

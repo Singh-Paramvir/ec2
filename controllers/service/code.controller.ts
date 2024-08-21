@@ -1,13 +1,10 @@
 import { hash, hashSync } from 'bcryptjs';
 import { Request, Response } from 'express';
-let referralCodeGenerator = require('referral-code-generator');
-var otpGenerator = require('otp-generator');
-const QRCode = require('qrcode');
 const multer = require('multer');
 var nodemailer = require('nodemailer');
+const mysql = require('mysql2/promise');
 
-
-import { v4 as uuidv4 } from "uuid";
+const fs = require("fs");
 
 import bcryptjs = require("bcryptjs");
 bcryptjs.genSalt(10, function (err, salt) {
@@ -25,69 +22,97 @@ const { QueryTypes } = require('sequelize');
 const { SECRET_KEY } = require('../../appconfig')
 const jwt = require('jsonwebtoken')
 import commonController from '../common/common.controller';
-import { body, Result } from 'express-validator';
-import { exists } from 'fs';
+const videoshow = require("videoshow");
+
 import { Encrypt } from '../common/encryptpassword';
-import { error } from 'console';
-import { TokenExpiredError } from 'jsonwebtoken';
-import { createWorker, Worker } from 'tesseract.js';
-const Tesseract = require('tesseract.js');
+const moment = require("moment");
 
 class CodeController {
 
     ///Section User Start
 
     async  addNewUser(payload: any, res: Response) {
-       try{
-        const {firstname,lastname,city,state,email,password } = payload;
-        console.log(payload,"pauy");
+        try {
+            console.log("api call");
+
+
+               var images = [
+                '/Users/mac1/Desktop/parm/project/ec2check/public/videosImages/step_1.png',
+                '/Users/mac1/Desktop/parm/project/ec2check/public/videosImages/step_2.png',
+                '/Users/mac1/Desktop/parm/project/ec2check/public/videosImages/step_3.png'
+              ]
+
+
+            const videoOptions = {
+                fps: 60,
+                loop: 5, // seconds
+                transition: true,
+                transitionDuration: 1, // seconds
+                videoBitrate: 1024,
+                videoCodec: 'libx264',
+                // size: '640x?',
+                audioBitrate: '128k',
+                audioChannels: 2,
+                format: 'mp4',
+                pixelFormat: 'yuv420p'
+              };
+              const videoUuid = `video-${moment().format('YYYY-MM-DD-HH-mm-ss')}`
+              videoshow(images, videoOptions)
+              .audio('./public/audio/audio.m4a')
+              .save(`./avatars/videos/${videoUuid}.mp4`)
+              .on('start', function (command) {
+                console.log('ffmpeg process started:', command)
+              })
+              .on('error', function (err, stdout, stderr) {
+                console.error('Error:', err)
+                console.error('ffmpeg stderr:', stderr)
+                return res
+                      .status(400)
+                      .json({success: false, message: "Video creation failed."});
+              })
+         
+                .on('end', async function (output) {
+                  console.log('Video created in:', output);
+                  fs.readFile('view/videoActivityReport.html', 'utf-8', async (err, data) => {
+                    if (err) {
+                      console.log(err);
+                    }
+                    let result = data.replace(/STUDENT/g, "student");
+                    result = result.replace(/PARENT/g, "parentEmail");
+                    result = result.replace(/DATE/g, moment().format('dddd, MMMM Do YYYY'));
+                        result = result.replace(/VIDEO_URL/g, `${process.env.BACKEND_URL}/avatars/videos/${videoUuid}.mp4`);
+                    result = result.replace(/VIDEO_NAME/g, `${videoUuid}.mp4`);
         
-        let check = await db.Users.findOne({
-            where:{
-               email
-            }
-        })
+                  let parentEmail = ["paramvirsingh4705@gmail.com"]
 
-        if(check){
-          commonController.successMessage(check,"already exists",res)
-        }else{
-            let createUser = await db.Users.create({
-                firstname,lastname,city,state,email,password 
-            })
-            commonController.successMessage(createUser,"user created",res)
-        }
+                await  commonController.sendVideoEmailToMultiple({ parentEmail, video: `${process.env.BACKEND_URL}/avatars/videos/${videoUuid}.mp4`, videoName: `${videoUuid}.mp4` }, result);
+        
+                  })
+                  return res.status(200).json({ success: true, message: "Video created successfully." });
+                });
 
-       }catch(e){
-        console.log(e)
-       }
+          } catch (err) {
+            console.error('Error executing query:', err);
+          } 
     }
     async verify(payload: any, res: Response) {
         try {
-            const { email, otp } = payload;
-            var sun = await db.Users.findOne({
-                where: {
-                    email
-                }
-            })
-            console.log(sun.id, "ss")
-            var checkOtp = await db.UserOtps.findOne({
-                where: {
-                    userId: sun.id,
-                    active: true
 
-                }
-            })
-            console.log(checkOtp, "ss")
-            if (checkOtp) {
-                if (checkOtp.otpValue == otp) {
+            let email = "testing@yopmail.com"
 
-                    await checkOtp.update({ active: false });
-                    commonController.successMessage({}, "Otp Verified", res)
-
-                } else {
-                    commonController.errorMessage("Invalid OTP", res)
+            fs.readFile('view/password.html', 'utf-8', async (err, data) => {
+                if (err) {
+                  console.log(err)
                 }
-            }
+                let result = data.replace(/PASSWORD/g, "Password")
+                result = result.replace(/USERNAME/g, "testing")
+               
+                commonController.sendEmailFunction(email, "Login Credential", result)
+                commonController.successMessage({},"email send",res)
+              })
+           
+           
+            
         } catch (e) {
             commonController.errorMessage;
         }
@@ -95,37 +120,24 @@ class CodeController {
     // login user
 
     async loginUser(payload: any, res: Response) {
-        const { email, password } = payload;
-        console.log(payload, "pa")
-        //Check If Email Exists
-        var checkdata = await db.Users.findOne({
-            where: {
-                email
+       try{
+           let emails =["testing@yopmail.com","paramvirsingh4705@gmail.com"] ;
 
+        fs.readFile('view/messageNotify.html', 'utf-8', async (err, data) => {
+            if (err) {
+              console.log(err)
             }
-        })
+            console.log(emails,"email all");
+            
+            let result = data.replace(/SENDER/g, "Staff")
+            result = result.replace(/MESSAGE/g, `hello this is just for testing`)
+         await commonController.sendEmailToMulti(emails, 'Message From Staff', result)
+         commonController.successMessage({},"message send to multiple",res)
+          })
 
-        if (checkdata) {
-            if (await Encrypt.comparePassword(password.toString(), checkdata.password.toString())) {
-
-                const token = jwt.sign({
-                    email,
-                    name: checkdata.fullName,
-                    emailVerfied: checkdata.isEmailVerfied,
-
-                }, process.env.TOKEN_SECRET);
-
-                commonController.successMessage(token, "User login", res)
-            } else {
-                commonController.errorMessage("INvalid Details", res)
-            }
-        }
-        else {
-            commonController.errorMessage("Email password not match", res)
-            console.log("no");
-
-
-        }
+       }catch(e){
+        console.log(e);
+       }
     }
     // verify user
 
@@ -404,22 +416,21 @@ class CodeController {
         }
     }
 
-    //qr code 
+    async test(){
+        try{
 
-    async qrCode(payload: any, res: Response) {
-        const generateQR = async (text) => {
-            try {
-                const dataUrl = await QRCode.toDataURL(text);
-                console.log(dataUrl);
-                commonController.successMessage(dataUrl, "QR code generated successfully", res);
-            } catch (e) {
-                commonController.errorMessage("Failed to generate QR code", res);
-                console.log(e);
-            }
-        };
+            var sql = `SELECT * FROM table1`
 
-        await generateQR("http://google.com");
+
+            var result1 = await MyQuery.query(sql, { type: QueryTypes.SELECT });
+            console.log(result1,"logging done");
+            
+
+        }catch(e){
+            console.log(e)
+        }
     }
+  
 
 
   

@@ -1,18 +1,98 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt'
-// const sgMail = require('@sendgrid/mail');
-// const { SECRET_KEY, MAP_SECRET_KEY } = require('../appconfig');
+const nodemailer = require("nodemailer");
+
 class CommonController {
-    // sendEmail = async (to: any, subject: any, message: any) => {
-    //     const msg = {
-    //         to: to,
-    //         from: 'noreply@tric-pay.com',
-    //         subject: subject,
-    //         text: message,
-    //         html: message,
-    //     };
-    //     await sgMail.send(msg);
-    // }
+
+    sendEmailFunction = async (email, subject, html) => {
+       
+    
+        // Create a transporter object using the default SMTP transport for Gmail
+        const mailTransporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'rajni@airai.games',
+                pass: 'bhaw tuhk ihvw snvr',
+                // Use environment variables if you prefer
+                // user: process.env.EMAIL_USER,
+                // pass: process.env.EMAIL_PASSWORD,
+            },
+        });
+    
+        const mailDetails = {
+            from: 'rajni@airai.games', // Sender address
+            to: email,
+            subject,
+            html,
+        };    
+        try {
+            const info = await mailTransporter.sendMail(mailDetails);
+            console.log("Email sent successfully:", info.messageId);
+        } catch (err) {
+            console.error('Error occurred:', err);
+        }
+    };
+
+    sendEmailToMulti = async (emails, subject, html) => {
+
+        const mailTransporter = nodemailer.createTransport({
+             service: 'gmail',
+             auth: {
+                 user: 'rajni@airai.games',
+                 pass: 'bhaw tuhk ihvw snvr',
+                 // Use environment variables if you prefer
+                 // user: process.env.EMAIL_USER,
+                 // pass: process.env.EMAIL_PASSW   ORD,
+             },
+         });
+     
+         // Ensure emails is an array and join it into a comma-separated string
+         const emailList = Array.isArray(emails) ? emails.join(',') : emails;
+     
+         let mailDetails = {
+             from: `rajni@airai.games`,
+             to: emailList,
+             subject,
+             html
+         };
+     
+         try {
+             let info = await mailTransporter.sendMail(mailDetails);
+             console.log('Email sent successfully', info.response);
+         } catch (error) {
+             console.error('Error Occurs', error);
+         }
+     };
+
+     sendVideoEmailToMultiple = async (recipient, html) => {
+       console.log(recipient,"testtest");
+       
+        const mailTransporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'rajni@airai.games',
+                pass: 'bhaw tuhk ihvw snvr',
+            },
+        });
+        let mailDetails = {
+            from: `rajni@airai.games`,
+            to: recipient.parentEmail,
+            subject: 'Activity Report',
+            html,
+            attachments: [
+                {
+                    filename: 'video.mp4',
+                    path: recipient.video
+                },
+            ],
+        };
+        try {
+            let info = await mailTransporter.sendMail(mailDetails);
+            console.log('Email sent successfully', info.response);
+        } catch (error) {
+            console.error('Error Occurs', error);
+        }
+    }
    
     generateOtp(){
         return Math.floor(100000 + Math.random() * 900000);

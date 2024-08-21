@@ -26,7 +26,6 @@ const router=express.Router();
    router.put("/changePassword",userController.changePassword);
    router.post("/getAll",userController.getAll);
    router.get("/delete",userController.deleteUser);
-   router.post("/qrcode",userController.qrCode);
    router.post("/postimage",upload.single("profile"),userController.postImage);
   //  router.post("/getwallet",userController.addWallet);
 
