@@ -17,16 +17,9 @@ import express from 'express';
  })
 
 const router=express.Router();
- router.post("/register",userController.register);
- router.post("/verify",userController.verify);
+
    router.post("/login",userController.login);
-   router.post("/updatePassword",userController.updatePassword);
-   router.put("/newPassword",userController.newPassword);
-   router.put("/updateProfile",userController.updateProfile);
-   router.put("/changePassword",userController.changePassword);
-   router.post("/getAll",userController.getAll);
-   router.get("/delete",userController.deleteUser);
-   router.post("/postimage",upload.single("profile"),userController.postImage);
+ 
   //  router.post("/getwallet",userController.addWallet);
 
   //  router.post("/test",userController.test);

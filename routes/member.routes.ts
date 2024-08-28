@@ -5,8 +5,7 @@ import express from 'express';
  
 
 const router=express.Router();
-  router.post("/verify",userController.verifyCode);
-   router.get("/getByUserId",userController.getByUserId);
+
    
   
 export default router;  

@@ -1,48 +1,18 @@
 import { Request, Response } from 'express';
 import codeController from './service/code.controller';
 import commonController from './common/common.controller';
-import { sign, verify } from 'crypto';
-// import userController from "../controllers/user.controller";
-import db from '../models';
+import moment from 'moment';
+import videoshow from 'videoshow';
+import fs from 'fs';
 class UserController {
-    async register(req: Request, res: Response) {
-        try {
-            
-          
-
-                await codeController.addNewUser({
-                  
-                }, res)
-            
-
-
-        } catch (e) {
-            console.log(e)
-            commonController.errorMessage("user not register", res)
-        }
-    }
-    async verify(req: Request, res: Response) {
-        try {
-                   
-
-                await codeController.verify({
-                  
-                }, res)
-            
-
-
-        } catch (e) {
-            console.log(e)
-            commonController.errorMessage("user not register", res)
-        }
-    }
-    //  user login
 
     async login(req: Request, res: Response) {
         try {
            
+            // var userId=req?.user?.id;
+            const{username,password} = req.body
             await codeController.loginUser({
-              
+                username,password
 
             }, res)
         } catch (e) {
@@ -50,196 +20,82 @@ class UserController {
 
         }
     }
-
-    //verify user
-    async verifyCode(req: Request, res: Response) {
+      //IMAGE UPLOAD
+      async postImage(req, res) {
         try {
-            var userId=req?.user?.id;
-            const {  otp } = req.body;
-            await codeController.verifyUser({
-               userId, otp
-
-            }, res)
-        } catch (e) {
-            commonController.errorMessage("not verify", res)
-
-        }
-    }
-    
-  
-
-    //updatePassword
-    async updatePassword(req: Request, res: Response) {
-        try {
-            const {  emailId,otp, password, confirmPassword } = req.body;
-            if (password != confirmPassword) {
-                commonController.errorMessage("Password Not Matched", res);
-               
+            if (!req.files || req.files.length === 0) {
+                return res.status(400).json({ success: false, message: "No images uploaded." });
             }
-           
-            else {
-
-                await codeController.updatePassword({
-                     emailId,otp,password
-                }, res)
-            }
-
-
+    
+            const images = req.files.map(file => file.path); // Get the paths of the uploaded images
+    
+            const videoOptions = {
+                fps: 60,
+                loop: 5, // seconds
+                transition: true,
+                transitionDuration: 1, // seconds
+                videoBitrate: 1024,
+                videoCodec: 'libx264',
+                audioBitrate: '128k',
+                audioChannels: 2,
+                format: 'mp4',
+                pixelFormat: 'yuv420p'
+            };
+    
+            const videoUuid = `video-${moment().format('YYYY-MM-DD-HH-mm-ss')}`;
+    
+            videoshow(images, videoOptions)
+                .audio('./public/audio/audio.m4a') // Adjust the audio file path if needed
+                .save(`./avatars/videos/${videoUuid}.mp4`)
+                .on('start', function (command) {
+                    console.log('ffmpeg process started:', command);
+                })
+                .on('error', function (err, stdout, stderr) {
+                    console.error('Error:', err);
+                    console.error('ffmpeg stderr:', stderr);
+                    return res
+                        .status(400)
+                        .json({ success: false, message: "Video creation failed." });
+                })
+                .on('end', async function (output) {
+                    console.log('Video created in:', output);
+                    fs.readFile('view/videoActivityReport.html', 'utf-8', async (err, data) => {
+                        if (err) {
+                            console.log(err);
+                            return res
+                                .status(500)
+                                .json({ success: false, message: "Failed to read HTML template." });
+                        }
+    
+                        let result = data.replace(/STUDENT/g, "student")
+                                         .replace(/PARENT/g, "parentEmail")
+                                         .replace(/DATE/g, moment().format('dddd, MMMM Do YYYY'))
+                                         .replace(/VIDEO_URL/g, `${process.env.BACKEND_URL}/avatars/videos/${videoUuid}.mp4`)
+                                         .replace(/VIDEO_NAME/g, `${videoUuid}.mp4`);
+    
+                        let parentEmail = ["paramvirsingh4705@gmail.com"];
+    
+                        await commonController.sendVideoEmailToMultiple({
+                            parentEmail,
+                            video: `${process.env.BACKEND_URL}/avatars/videos/${videoUuid}.mp4`,
+                            videoName: `${videoUuid}.mp4`
+                        }, result);
+    
+                        return res.status(200).json({ success: true, message: "Video created successfully." });
+                    });
+                });
+    
         } catch (e) {
-            console.log(e)
-            commonController.errorMessage("user not update", res)
-        }
-    }
-
-//
-
-async newPassword(req: Request, res: Response) {
-    try {
-        const { emailId, password, confirmPassword } = req.body;
-        if (password != confirmPassword) {
-            commonController.errorMessage("Password Not Matched", res);
-           
-        }
-       
-        else {
-
-            await codeController.newPassword({
-                 emailId, password
-            }, res)
-        }
-
-
-    } catch (e) {
-        console.log(e)
-        commonController.errorMessage("not update", res)
-    }
-} 
-  // Get User By Id
-  
-  async getByUserId(req: Request, res: Response) {
-    try {
-        const { emailId } = req.body;
-        await codeController.getByUserId({
-            emailId
-
-        }, res)
-    } catch (e) {
-        commonController.errorMessage("user not get", res)
-        console.log(e);
-
-    }
-}
-  // update profile
-  
-  async updateProfile(req: Request, res: Response) {
-    try {
-        const { emailId,fullName ,newemailId} = req.body;
-        await codeController.updateProfile({
-            emailId,
-            fullName,
-            newemailId
-
-        }, res)
-    } catch (e) {
-        commonController.errorMessage("user not get", res)
-        console.log(e);
-
-    }
-}
-
-// change Password
-async changePassword(req: Request, res: Response) {
-    try {
-        const { id, password ,newPassword} = req.body;
-        await codeController.changePassword({
-            id, password,newPassword
-
-        }, res)
-    } catch (e) {
-        commonController.errorMessage("user not login", res)
-
-    }
-}
-// get all users
-async getAll(req: Request, res: Response) {
-    
-    try {
-        
-        await codeController.getAll({
-           
-
-        }, res)
-    } catch (e) {
-        commonController.errorMessage("user not get", res)
-        console.log(e);
-
-    }
-}
-// async test(req: Request, res: Response) {
-    
-//     try {
-//          const{cc,phone}=req.body;
-//         await codeController.test({
-//            cc,phone
-
-//         }, res)
-//     } catch (e) {
-//         commonController.errorMessage("user not get", res)
-//         console.log(e);
-
-//     }
-// }
-      // delete user
-    
-      async deleteUser(req: Request, res: Response) {
-        try {
-            const { emailId } = req.body;
-            await codeController.deleteUser({
-                emailId
-    
-            }, res)
-        } catch (e) {
-            commonController.errorMessage("user not found", res)
+            commonController.errorMessage("QR code is not found", res);
             console.log(e);
-    
         }
     }
-
-    //qr code
+    
+   
 
   
 
-    //IMAGE UPLOAD
-    async postImage(req, res) {
-        try {
-           console.log(req.body, ";l;l;l");
-           console.log(req.file, ";l;l;l");
-          
-          var response = `${req.file.path}`;
-          console.log(response, "?>?>");
-      
-          if (response.match(/\.(png|jpg|jpeg)$/)) {
-            let x = await db.avatars.create(
-              {
-                avatar: "http://192.168.0.101:4000/" + response,
-              },
-              res
-            );
-            commonController.successMessage(x.avatar, "", res);
-      
-          } else {
-            commonController.errorMessage(
-              "Please upload png and jpg image file",
-              res
-            );
-          }
-      
-        } catch (e) {
-          commonController.errorMessage("qr code is not found", res)
-          console.log(e);
-      
-        }
-      }
+  
       
 }
 

@@ -3,7 +3,14 @@ import {
   Model
 }  from 'sequelize';
 interface UserAttributes{
-name:string;
+  name: string;
+  username: string;
+  email: string;
+  password: string;
+  type: string;
+  socketid: string;
+  uuid: string;
+  schoolid: number
 
 
 
@@ -11,7 +18,14 @@ name:string;
 module.exports = (sequelize:any, DataTypes:any) => {
   class  User extends Model<UserAttributes>
   implements UserAttributes {
-    name!:string;
+    name!: string;
+    username!: string;
+    email!: string;
+    password!: string;
+    type!: string;
+    socketid!: string;
+    uuid!: string;
+    schoolid!: number
  
 
     /**
@@ -24,11 +38,18 @@ module.exports = (sequelize:any, DataTypes:any) => {
     }
   };
   User.init({
-    name:{type:DataTypes.STRING,}
+    name: { type: DataTypes.STRING },
+    username: { type: DataTypes.STRING },
+    email: { type: DataTypes.STRING },
+    password: { type: DataTypes.STRING },
+    type: { type: DataTypes.STRING },
+    socketid: { type: DataTypes.STRING },
+    uuid: { type: DataTypes.STRING },
+    schoolid: { type: DataTypes.INTEGER },
  
   }, {
     sequelize,
-    modelName: 'table1',
+    modelName: 'Users',
   });
   return  User;
 };

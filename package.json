@@ -42,6 +42,7 @@
     "node-cron": "^3.0.0",
     "node-fetch": "^3.1.0",
     "nodemailer": "^6.9.14",
+    "pg": "^8.12.0",
     "sequelize": "^6.6.5",
     "videoshow": "^0.1.12"
   }
