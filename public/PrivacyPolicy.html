@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Socket.IO Client</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io('http://localhost:7777');
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server');
+    });
+  </script>
+</head>
+<body>
+  Open the console to see the connection status.
+</body>
+</html>
+    
