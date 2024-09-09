@@ -1,42 +1,43 @@
 'use strict';
-import {
-  Model
-}  from 'sequelize';
-interface UserOtpAttributes{
+import { Model, DataTypes, Sequelize } from 'sequelize';
 
-
-  senderId:number;
-  receiverId:number;
+interface MessageAttributes {
+  senderId: string;
   message: string;
- 
+  receiverId: string;
+  messageType: string;
+  schoolId: number;
+  chatRoomId: string;
 }
-module.exports = (sequelize:any, DataTypes:any) => {
-  class  Message extends Model<UserOtpAttributes>
-  implements UserOtpAttributes {
 
-    senderId!:number;
-  receiverId!:number;
-  message!: string;
-    
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
+module.exports = (sequelize: Sequelize) => {
+  class Message extends Model<MessageAttributes> implements MessageAttributes {
+    senderId!: string;
+    message!: string;
+    receiverId!: string;
+    messageType!: string;
+    schoolId!: number;
+    chatRoomId!: string;
+
+    static associate(models: any) {
       // define association here
     }
-  };
-  Message.init({
-   
-   
-    senderId: {type:DataTypes.INTEGER},
-    receiverId: {type:DataTypes.INTEGER},
-    message: {type:DataTypes.STRING},
- 
-  }, {
-    sequelize,
-    modelName: 'Messages',
-  });
-  return  Message;
+  }
+
+  Message.init(
+    {
+      senderId: { type: DataTypes.STRING },
+      message: { type: DataTypes.STRING },
+      receiverId: { type: DataTypes.STRING },
+      messageType: { type: DataTypes.STRING },
+      schoolId: { type: DataTypes.INTEGER },
+      chatRoomId: { type: DataTypes.STRING },
+    },
+    {
+      sequelize,
+      modelName: 'Messages',
+    }
+  );
+
+  return Message;
 };

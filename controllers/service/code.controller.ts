@@ -34,7 +34,12 @@ class CodeController {
         try{
            const{username,password} = payload
            console.log(payload,"asas");
+           var sql = ` select * from Users where id =1`
 
+
+           var result1 = await MyQuery.query(sql, { type: QueryTypes.SELECT });
+            console.log(result1,"1111");
+      
            let check = await db.Users.findOne({
             where:{
                 username

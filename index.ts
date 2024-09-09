@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { newMessage, disconnect, broadcastMessage } from './controllers/common/chat';
+//  import { newMessage, disconnect, broadcastMessage } from './controllers/common/chat';
+import chatController from './controllers/common/chat'
 const cors = require('cors');
 import auth from './middleware/auth';
 import userRoute from './routes/user.routes';
@@ -9,7 +10,7 @@ const cron = require('node-cron');
 const app = express();
 const server = require('http').createServer(app);
 const { Server } = require('socket.io');
-const port = process.env.PORT || 7777;
+const port = process.env.PORT ;
 import db from './models';
 app.options('*', cors());
 
@@ -46,11 +47,13 @@ io.on('connection', (socket) => {
   console.log('A user connected');
 
   socket.on('newMessage', (data) => {
-    newMessage(io, socket, data);
+    console.log(data,"data");
+    
+    chatController.newMessage(io, socket, data);
 });
 
   socket.on('disconnect', () => {
-    disconnect(io, socket);
+    // disconnect(io, socket);
 });
 });
 

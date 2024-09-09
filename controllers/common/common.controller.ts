@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 class CommonController {
 
     sendEmailFunction = async (email, subject, html) => {
+       console.log("send email call",email);
        
     
         // Create a transporter object using the default SMTP transport for Gmail
@@ -124,6 +125,23 @@ class CommonController {
             console.log(e);
         }
     }
+    createSuccessResponse = (
+        message,
+        data = null,
+        success = true
+      ) => {
+        return { success, message, data };
+      };
+
+      uuidv4_34 = () => {
+        return "xxxxxxxx-xxxx-1xxx-axxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+          var r = (Math.random() * 16) | 0,
+            v = c == "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      };
+
+
     errorMessage(msg: string, res: Response) {
        try{
         return res.status(400).send({
