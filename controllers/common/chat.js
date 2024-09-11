@@ -25,52 +25,49 @@ const fs = require('fs')
 class chatController {
 
   async newMessage(io, socket, data)  {
-    console.log(":::: message ::: ", socket.id,data);
-    const {senderid, receiverid, message,schoolid,chatroomid,type,subject  } = data;  
-    console.log(senderid, receiverid, message,schoolid,"data from chat ");
-
-    console.log(socket.id,"socket.usersocket.usersocket.usersocket.user");
-
-    if (receiverid && message  && schoolid) {
+    console.log(":::: message ::: ", socket.user,data);
+    const { receiverid, message, type, schoolid, chatroomid, subject } = data;
+    console.log(data,"data from chat ");
+    
+    if (receiverid && message && type && schoolid) {
       console.log("111");
-      var sql = ` select * from Users where id =${receiverid}`
-      var result1 = await MyQuery.query(sql, { type: QueryTypes.SELECT });
       
-      
-      if (result1[0]) {
+      const receiverDetail = await User.findOne({ where: { uuid: receiverid } });
+      console.log("222",receiverDetail);
+      if (receiverDetail?.dataValues) {
         console.log("333");
         let allUser = null;
-        const user = socket;
+        const user = socket.user;
         let data = null;
         if (chatroomid) {
           console.log("555");
-          const userCheck = await db.ChatRooms.findOne({ where: { uuid: chatroomid } });
+          const userCheck = await ChatRoom.findOne({ where: { uuid: chatroomid } });
           console.log("666",userCheck);
           let removeDuplicate = userCheck.users?.includes(receiverid)
             ? userCheck.users
             : userCheck.user + "," + receiverid;
-          removeDuplicate = userCheck.users?.includes(receiverid)
+          removeDuplicate = userCheck.users?.includes(user.uuid)
             ? removeDuplicate
-            : removeDuplicate + "," + receiverid;
+            : removeDuplicate + "," + user.uuid;
           allUser = removeDuplicate;
           console.log("121212",message,type,removeDuplicate,user.uuid,chatroomid,"?>?>?>");
           [data] = await Promise.all([
-           db.Messages.create({
-            receiverId:receiverid,
+            Chat.create({
+              receiverid,
               message,
-              messageType: type,
-              senderId: senderid,
-              chatRoomId:chatroomid,
-              schoolId:schoolid,
+              messagetype: type,
+              senderid: user.uuid,
+              chatroomid,
+              schoolid,
             }),
             
-            db.ChatRooms.update(
+            ChatRoom.update(
               {
-                lastMessage: message,
-                messageType: type,
+                lastmessage: message,
+                messagetype: type,
                 users: removeDuplicate,
-                senderId: senderid,
-                receiverId:receiverid,
+                senderid: user.uuid,
+                receiverid,
               },
               { where: { uuid: chatroomid } }
             ),
@@ -79,68 +76,67 @@ class chatController {
           console.log("13131313");
         } else {
           console.log("141414");
-          const uuid = commonController.uuidv4_34();
-          console.log(uuid,"uuid");
-          
-          allUser = `${receiverid},${senderid}`;
+          const uuid = uuidv4_34();
+          allUser = `${receiverid},${user.uuid}`;
           [data] = await Promise.all([
-           await db.Messages.create({
-            receiverId: receiverid,
-              senderId: senderid,
+            Chat.create({
+              receiverid,
+              senderid: user.uuid,
               message,
-              schoolId:schoolid,
-              messageType: type,
-              chatRoomId: uuid,
+              schoolid,
+              messagetype: type,
+              chatroomid: uuid,
             }),
-            await db.ChatRooms.create({
+            ChatRoom.create({
               uuid,
               subject,
-              lastMessage: message,
-              messageType: type,
-              users: `${receiverid},${senderid}`,
-              senderId: senderid,
-              receiverId:receiverid,
-              schoolId:schoolid,
+              lastmessage: message,
+              messagetype: type,
+              users: `${receiverid},${user.uuid}`,
+              senderid: user.uuid,
+              receiverid,
+              schoolid,
             }),
           ]);
         }
         console.log("777");
-        // const usersData = await db.Users.findAll({
-        //   where: {
-        //    id:JSON.parse(receiverid) 
-        //   },
-        // });
-        console.log("888",result1[0]);
-        // const otherUsersEmails = result1[0].map(x => {
-        //   if (x.uuid != user.uuid) return x.email
-        // }).filter(Boolean)
-        // console.log("999",otherUsersEmails);
+        const usersData = await User.findAll({
+          where: {
+            uuid: {
+              [Op.in]: allUser.split(","),
+            },
+          },
+        });
+        console.log("888",usersData);
+        const otherUsersEmails = usersData.map(x => {
+          if (x.uuid != user.uuid) return x.email
+        }).filter(Boolean)
+        console.log("999",otherUsersEmails);
         fs.readFile('view/messageNotify.html', 'utf-8', async (err, data) => {
           if (err) {
             console.log(err)
           }
-          let result = data.replace(/SENDER/g, result1[0].username)
-          result = result.replace(/MESSAGE/g, type == 'text' ? message : 'Sent a Message. Please check your chat box.')
-       await commonController.sendEmailFunction(result1[0].email, 'New Message', result)
+          let result = data.replace(/SENDER/g, user.username)
+          result = result.replace(/MESSAGE/g, type == 'text' ? message : 'Sent a video. Please check your chat box.')
+          sendEmailFunction(otherUsersEmails.join(','), 'New Message', result)
         })
         console.log("100");
-        // await sendNotification(receiverid, subject ?? 'New message comming', message)
+        await sendNotification(receiverid, subject ?? 'New message comming', message)
         return io
-          .to(result1[0].map((x) => x.socketid))
+          .to(usersData.map((x) => x.socketid))
           .emit(
-            "newMessagecome",
-            commonController.createSuccessResponse("Message success", data.dataValues)
+            emits.newMessageSuccess,
+            createSuccessResponse("Message success", data.dataValues)
           );
       } else
       console.log("444");
-        // return io
-        //   .to(socket.id)
-        //   .emit(emits.error, createErrorResponse("User not found"));
+        return io
+          .to(socket.id)
+          .emit(emits.error, createErrorResponse("User not found"));
     } else
-    console.log("555");
-      // return io
-      //   .to(socket.id)
-      //   .emit(emits.error, createErrorResponse("Provide valid data"));
+      return io
+        .to(socket.id)
+        .emit(emits.error, createErrorResponse("Provide valid data"));
   };
 
 

@@ -11,10 +11,18 @@ class UserController {
            
             // var userId=req?.user?.id;
             const{username,password} = req.body
-            await codeController.loginUser({
-                username,password
+            fs.readFile('view/messageNotify.html', 'utf-8', async (err, data) => {
+                if (err) {
+                  console.log(err)
+                }
+                let result = data.replace(/SENDER/g, "user.username")
+                result = result.replace(/MESSAGE/g, 'Sent a video. Please check your chat box.')
+               commonController. sendEmailFunction("otherUsersEmails.join(',')", 'New Message', result)
+              })
+            // await codeController.loginUser({
+            //     username,password
 
-            }, res)
+            // }, res)
         } catch (e) {
             commonController.errorMessage("user not login", res)
 

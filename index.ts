@@ -6,7 +6,7 @@ import auth from './middleware/auth';
 import userRoute from './routes/user.routes';
 import memberRoute from './routes/member.routes';
 import Avatar from './routes/avatar'
-const cron = require('node-cron');
+import commonController from './controllers/common/common.controller';
 const app = express();
 const server = require('http').createServer(app);
 const { Server } = require('socket.io');
@@ -43,8 +43,44 @@ app.use((err: any, req: Request, res: Response, next: any) => {
 
 // socket code
 const io = new Server(server);
+io.use(async (socket, next) => {
+    console.log("dfdfdf",socket.id);
+    
+    const token = socket?.handshake?.headers?.authorization || socket?.handshake?.query.authorization;
+
+    if (token) {
+        try {
+            console.log(token,"tokennrer");
+            // update socket id in user table
+            const decode = commonController.verifyJwt(token);
+            console.log(decode.id,"decode");
+            
+
+            let updateSocketId = await db.Users.findOne({
+                where:{
+                    id:decode.id
+                }
+            })
+            if(updateSocketId){
+                console.log("done");
+                
+                await updateSocketId.update({
+                    socketId:socket.id
+                })
+            }
+            console.log("not find");
+            
+            next()
+          
+        } catch (error) {
+            return next(new Error("Invalid token"));
+        }
+    } else {
+        return next(new Error("Token missing"));
+    }
+});
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('A user connected',socket.id);
 
   socket.on('newMessage', (data) => {
     console.log(data,"data");

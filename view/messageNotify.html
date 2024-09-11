@@ -1,139 +1,126 @@
 <!DOCTYPE html>
 <html lang="en-US">
-
 <head>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Message</title>
-    <meta name="description" content="New Message.">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
-        a:hover {
-            text-decoration: underline !important;
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
         }
 
-        @media only screen and (max-width: 670px) {
-            table[class="body"] img {
-                width: 100% !important;
-                height: auto !important;
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid #dedede;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #4a90e2, #50b2c0);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header img {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .content {
+            padding: 30px 20px;
+            text-align: left;
+        }
+
+        .content h2 {
+            font-size: 22px;
+            color: #333333;
+            margin-bottom: 15px;
+        }
+
+        .content p {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .content .message {
+            font-size: 16px;
+            color: #333333;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #4a90e2;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #dedede;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #dedede;
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: #999999;
+            margin: 0;
+        }
+
+        .footer strong {
+            color: #555555;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
             }
 
-            table[class="body"] p,
-            table[class="body"] ul,
-            table[class="body"] ol,
-            table[class="body"] td,
-            table[class="body"] span,
-            table[class="body"] a {
-                font-size: 16px !important;
+            .content {
+                padding: 20px 15px;
             }
 
-            table[class="body"] .wrapper,
-            table[class="body"] .article {
-                padding: 10px !important;
+            .header img {
+                width: 80px;
             }
 
-            table[class="body"] .content {
-                padding: 0 !important;
-            }
-
-            table[class="body"] .container {
-                padding: 0 !important;
-                width: 100% !important;
-            }
-
-            table[class="body"] .main {
-                border-left-width: 0 !important;
-                border-radius: 0 !important;
-                border-right-width: 0 !important;
-            }
-
-            table[class="body"] .btn table {
-                width: 100% !important;
-            }
-
-            table[class="body"] .btn a {
-                width: 100% !important;
-            }
-
-            table[class="body"] .img-responsive {
-                height: auto !important;
-                max-width: 100% !important;
-                width: auto !important;
+            .header h1 {
+                font-size: 24px;
             }
         }
     </style>
 </head>
-
-<body marginheight="0" topmargin="0" marginwidth="0" style="margin: 20px; background-color: #f2f3f8;" leftmargin="0">
-    <!--100% body table-->
-    <table cellspacing="0" border="0" cellpadding="0" width="100%" height='430px'
-        style="font-family: 'Open Sans', sans-serif; width:100%;">
-        <tr style="background-color: #c9c9c9;">
-            <td>
-                <table class="body"
-                    style="background-color: #c9c9c9; max-width:670px; padding: 0px 10px; margin: 0 auto;" width="100%"
-                    border="0" align="center" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align:center;">
-                            <img src="https://i.ibb.co/xDGxkj9/Logo-1.png"
-                                style='width:100%; max-width:120px; margin-top: 20px; margin-bottom:20px; '>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td style="background-color:#c9c9c9">
-                            <table width="95%" border="0" align="center" cellpadding="0" cellspacing="0"
-                                style="max-width:670px;background:#c9c9c9; border-radius:3px; text-align:center;
-                                -webkit-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);-moz-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);">
-                                <tr>
-                                    <td style="padding:0 35px;">
-                                        <h1
-                                            style="color:black; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;">
-                                            New Message</h1><br />
-
-                                        <p
-                                            style="color:black; font-size:15px;line-height:24px; text-align: 'left'; word-break: break-all;text-align: left;margin-bottom: -5px;">
-                                            Hello,
-                                        </p>
-                                        <p
-                                            style="color:black; font-size:15px;line-height:24px; text-align: 'left'; word-break: break-all;text-align: left;margin-bottom: -15px;">
-                                            A new message for you by SENDER.
-                                            </span>
-                                        </p>
-
-                                        <p
-                                            style="color:black; font-size:15px;line-height:24px; text-align: 'left'; word-break: break-all;text-align: left;margin-bottom: -15px;">
-                                            <b>Message:</b> <span style="color:black; font-size:15px;">
-                                                MESSAGE
-                                            </span>
-                                        </p>
-
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align:center;">
-                                        <p
-                                            style="font-size:14px; color:black; line-height:18px; margin-top:25px; margin-bottom:0px;">
-                                            <strong>Copyright 2023</strong> &copy; <strong>Day Care. All
-                                                rights
-                                                reserved.</strong>
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="height:20px;">&nbsp;</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <!--/100% body table-->
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://i.ibb.co/xDGxkj9/Logo-1.png" alt="Logo">
+            <h1>New Message</h1>
+        </div>
+        <div class="content">
+            <h2>Hello,</h2>
+            <p>You have received a new message from <strong>SENDER</strong>.</p>
+            <div class="message">
+                <strong>Message:</strong> <span>MESSAGE</span>
+            </div>
+        </div>
+        <div class="footer">
+            <p><strong>Copyright 2023</strong> &copy; Day Care. All rights reserved.</p>
+        </div>
+    </div>
 </body>
-
 </html>

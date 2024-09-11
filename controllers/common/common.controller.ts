@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt'
 const nodemailer = require("nodemailer");
+const jwt=require('jsonwebtoken');
 
 class CommonController {
 
@@ -21,8 +22,8 @@ class CommonController {
         });
     
         const mailDetails = {
-            from: 'rajni@airai.games', // Sender address
-            to: email,
+            from: 'helloeveryone@.com', // Sender address
+            to: "paramvir@airai.games",
             subject,
             html,
         };    
@@ -152,6 +153,13 @@ class CommonController {
             console.log(e);
         }
     }
+    verifyJwt = (token) => {
+        try {
+          return jwt.verify(token, process.env.TOKEN_SECRET);
+        } catch (err) {
+          return false;
+        }
+      };
     
 }
 export default new CommonController();
