@@ -32,7 +32,7 @@ class chatController {
     if (receiverid && message && type && schoolid) {
       console.log("111");
       
-      const receiverDetail = await User.findOne({ where: { uuid: receiverid } });
+      const receiverDetail = await db.Users.findOne({ where: { uuid: receiverid } });
       console.log("222",receiverDetail);
       if (receiverDetail?.dataValues) {
         console.log("333");
@@ -41,7 +41,7 @@ class chatController {
         let data = null;
         if (chatroomid) {
           console.log("555");
-          const userCheck = await ChatRoom.findOne({ where: { uuid: chatroomid } });
+          const userCheck = await db.ChatRooms.findOne({ where: { uuid: chatroomid } });
           console.log("666",userCheck);
           let removeDuplicate = userCheck.users?.includes(receiverid)
             ? userCheck.users
@@ -52,7 +52,7 @@ class chatController {
           allUser = removeDuplicate;
           console.log("121212",message,type,removeDuplicate,user.uuid,chatroomid,"?>?>?>");
           [data] = await Promise.all([
-            Chat.create({
+           await db.Chats.create({
               receiverid,
               message,
               messagetype: type,
@@ -61,7 +61,7 @@ class chatController {
               schoolid,
             }),
             
-            ChatRoom.update(
+          await db.ChatRooms.update(
               {
                 lastmessage: message,
                 messagetype: type,
@@ -79,7 +79,7 @@ class chatController {
           const uuid = uuidv4_34();
           allUser = `${receiverid},${user.uuid}`;
           [data] = await Promise.all([
-            Chat.create({
+            await db.Chats.create({
               receiverid,
               senderid: user.uuid,
               message,
@@ -87,7 +87,7 @@ class chatController {
               messagetype: type,
               chatroomid: uuid,
             }),
-            ChatRoom.create({
+            await db.ChatRoom.create({
               uuid,
               subject,
               lastmessage: message,
@@ -100,7 +100,7 @@ class chatController {
           ]);
         }
         console.log("777");
-        const usersData = await User.findAll({
+        const usersData = await db.Users.findAll({
           where: {
             uuid: {
               [Op.in]: allUser.split(","),
