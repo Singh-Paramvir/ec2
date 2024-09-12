@@ -11,10 +11,12 @@ class CommonController {
     
         // Create a transporter object using the default SMTP transport for Gmail
         const mailTransporter = nodemailer.createTransport({
-            service: 'gmail',
+            secure:true,
+            host: 'smtp.gmail.com',
+            port:465,
             auth: {
-                user: 'rajni@airai.games',
-                pass: 'bhaw tuhk ihvw snvr',
+                user: 'sunnykl1233@gmail.com',
+                pass: 'rcmd gnqj drwf yroa',
                 // Use environment variables if you prefer
                 // user: process.env.EMAIL_USER,
                 // pass: process.env.EMAIL_PASSWORD,
@@ -22,7 +24,7 @@ class CommonController {
         });
     
         const mailDetails = {
-            from: 'helloeveryone@.com', // Sender address
+             from: 'helloeveryone@.com', // Sender address
             to: "paramvir@airai.games",
             subject,
             html,
